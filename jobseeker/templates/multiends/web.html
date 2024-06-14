@@ -2,18 +2,18 @@
 
 <head>
     <link rel="stylesheet" href="https://cdn.acwing.com/static/jquery-ui-dist/jquery-ui.min.css">
-    <script src="http://code.jquery.com/jquery-latest.js"></script>
-    <script type="module" src="{% static 'js/dist/jobseeker.js' %}"></script>
+    <script src="https://cdn.acwing.com/static/jquery/js/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/game.css' %}">
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
     <link rel="icon" href="https://images.cnblogs.com/cnblogs_com/blogs/806686/galleries/2378007/o_240212131112_Icon.png">
 </head>
 
 <body style="margin: 0">
-    <div id="job_seeker_123"></div>
+    <div id="ac_game_12345678"></div>
     <script type="module">
-        import {JobSeek} from "{% static 'js/dist/jobseeker.js' %}";
+        import {AcGame} from "{% static 'js/dist/jobseeker.js' %}";
         $(document).ready(function(){
-            let job_seeker = new JobSeek("job_seeker_123");
+            let ac_game = new AcGame("ac_game_12345678");
         });
     </script>
 </body>

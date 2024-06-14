@@ -25,6 +25,7 @@ def register(request):
     user = User(username=username)
     user.set_password(password)
     user.save()
+    Jobseeker.objects.create(user = user,photo = "")
     login(request, user)
     return JsonResponse({
         'result': "success",

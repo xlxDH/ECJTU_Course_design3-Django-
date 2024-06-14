@@ -1,18 +1,17 @@
-export class JobSeek {
-    constructor(id, OS) {
+export class AcGame {
+    constructor(id, AcWingOS) {
         this.id = id;
-        this.$job_seeker = $('#' + id);
-        this.OS = OS;
+        this.$ac_game = $('#' + id);
+        this.AcWingOS = AcWingOS;
 
         this.settings = new Settings(this);
-        //this.menu = new Menu(this);
-        //this.playground = new Playground(this);
+        this.menu = new AcGameMenu(this);
+        //this.playground = new AcGamePlayground(this);
 
         this.start();
     }
 
     start() {
-
     }
-
 }
+

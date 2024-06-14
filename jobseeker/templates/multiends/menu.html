@@ -1,0 +1,66 @@
+{% load static %}
+
+<head>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <link rel="stylesheet" href = "{% static 'css/login.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .menu-container {
+            background-color: #ffffff;
+            width: 30%;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .menu-container h1 {
+            margin-bottom: 30px;
+            font-size: 32px;
+        }
+        .menu-container .button {
+            display: block;
+            height: 8%;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .menu-container .button.job-seeker {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .menu-container .button.company {
+            background-color: #2196F3;
+            color: white;
+        }
+        .menu-container .button.job-seeker:hover {
+            background-color: #45a049;
+        }
+        .menu-container .button.company:hover {
+            background-color: #0b7dda;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-container">
+        <h1>登录菜单</h1>
+        <button class="button job-seeker" onclick="window.location.href='job-seeker-login.html'">求职者登录</button>
+        <button class="button company" onclick="window.location.href='company-login.html'">公司登录</button>
+    </div>
+</body>
+

@@ -67,6 +67,10 @@ span {
 
 /* 最外层的大盒子 */
 .box {
+    position: absolute;
+    top: 15%;
+    left: 15%;
+    transform: reanslate(-10%, -10%);
     width: 1050px;
     height: 600px;
     display: flex;
