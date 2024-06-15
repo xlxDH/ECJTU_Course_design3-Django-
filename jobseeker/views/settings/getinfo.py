@@ -22,6 +22,18 @@ def getinfo_web(request):
             'result' : "success",
             'username' : jobseeker.user.username,
             'photo' : jobseeker.photo,
+            'phone': jobseeker.phone,
+            'sex': jobseeker.sex,
+            'residence': jobseeker.residence,
+            'graduation_year': jobseeker.graduation_year,
+            'education_level': jobseeker.education_level,
+            'graduation_school': jobseeker.graduation_school,
+            'desired_job': jobseeker.desired_job,
+            'expected_salary': jobseeker.expected_salary,
+            'job_status': jobseeker.job_status,
+            'work_location': jobseeker.work_location,
+            'bio': jobseeker.bio,
+            'resume': jobseeker.resume,
         })
 
 def getinfo(request) :
