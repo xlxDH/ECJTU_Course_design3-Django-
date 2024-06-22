@@ -6,4 +6,5 @@ urlpatterns = [
     path("menu/",include("jobseeker.urls.menu.index")),
     path("jobseeker/", include("jobseeker.urls.jobseeker.index")),
     path("settings/",include("jobseeker.urls.settings.index")),
+    path("hr/",include("jobseeker.urls.hr.index")),
 ]

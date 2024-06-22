@@ -1,11 +1,11 @@
 from django.http import JsonResponse
 from django.contrib.auth import login
 from django.contrib.auth.models import User
-from jobseeker.models.jobseekers.jobseekers import Jobseeker
+from jobseeker.models.companys.company import Company
 
 
 
-def register(request):
+def hr_register(request):
     data = request.GET
     username = data.get("username", "").strip()
     password = data.get("password", "").strip()
@@ -25,7 +25,7 @@ def register(request):
     user = User(username=username)
     user.set_password(password)
     user.save()
-    Jobseeker.objects.create(user = user,photo = "https://tse1-mm.cn.bing.net/th/id/OIP-C.-BD7wuSAaquBdulv7uAHjgHaHa?rs=1&pid=ImgDetMain")
+    Company.objects.create(user = user,photo = "https://tse1-mm.cn.bing.net/th/id/OIP-C.-BD7wuSAaquBdulv7uAHjgHaHa?rs=1&pid=ImgDetMain")
     login(request, user)
     return JsonResponse({
         'result': "success",

@@ -15,3 +15,19 @@ export class AcGame {
     }
 }
 
+export class hr_AcGame {
+    constructor(id, AcWingOS) {
+        this.id = id;
+        this.$ac_game = $('#' + id);
+        this.AcWingOS = AcWingOS;
+
+        this.settings = new hr_Settings(this);
+        this.menu = new hr_AcGameMenu(this);
+        //this.playground = new hr_AcGamePlayground(this);
+
+        this.start();
+    }
+
+    start() {
+    }
+}
