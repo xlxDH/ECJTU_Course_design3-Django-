@@ -185,13 +185,15 @@ load_profile() {
 
     show() {
         this.$profile.show();
+        this.$profile.css({
+                    width: '50%'
+        });
     }
 
     hide() {
         this.$profile.hide();
         this.$profile.css({
-                    width: '0',
-                    height: '0'
+                    width: '0'
              });
     }
 }
@@ -361,13 +363,15 @@ load_profile() {
 
     show() {
         this.$profile.show();
+        this.$profile.css({
+            width: '50%'
+        });
     }
 
     hide() {
         this.$profile.hide();
         this.$profile.css({
-                    width: '0',
-                    height: '0'
+                    width: '0'
              });
     }
 }
