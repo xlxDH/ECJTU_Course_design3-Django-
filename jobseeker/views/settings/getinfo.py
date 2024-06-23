@@ -19,6 +19,7 @@ def getinfo_web(request):
     else:
         jobseeker = Jobseeker.objects.get(user=user)
         return JsonResponse({
+            'id' : jobseeker.id,
             'result' : "success",
             'username' : jobseeker.user.username,
             'photo' : jobseeker.photo,

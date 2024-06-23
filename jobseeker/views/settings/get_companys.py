@@ -10,6 +10,7 @@ def get_companys(request):
     for company in companies:
         user = company.user
         company_date = {
+            'id': company.id,
             'username': user.username,
             'photo': company.photo,
             'phone': company.phone,

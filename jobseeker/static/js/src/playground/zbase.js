@@ -13,21 +13,24 @@ class AcGamePlayground {
                         <p id="modalSalary"></p>
                         <p id="modalLocation"></p>
                         <p id="modalPhone"></p>
+                        <button id="applyButton">Apply for job</button>
                     </div>
                 </div>
+                <button class="close-playground-button">返回菜单</button>
             </div>
         `);
 
         this.jobListingsContainer = this.$playground.find('#jobListings');
         this.modal = this.$playground.find('#companyModal');
-        this.modalCompanyName = this.$playground.find('#modalCompanyName');
         this.modalCompanyDescription = this.$playground.find('#modalCompanyDescription');
+        this.$modalCompanyName = this.$playground.find('#modalCompanyName');
         this.$modalJobPosition = this.$playground.find('#modalJobPosition');
         this.$modalSalary = this.$playground.find('#modalSalary');
         this.$modalLocation = this.$playground.find('#modalLocation');
         this.$modalPhone = this.$playground.find('#modalPhone');
+        this.$applyButton = this.$playground.find('#applyButton');
         this.closeButton = this.$playground.find('.modal-close-button');
-
+        this.$closePlaygroundButton = this.$playground.find('.close-playground-button');
         this.hide();
 
         this.start();
@@ -65,15 +68,17 @@ class AcGamePlayground {
             `);
             companyCard.addClass('offset-right');
             companyCard.on('click', () => {
-                this.showModal(company);
+                this.fetchCompanyDetails(company.id);
             });
-
             this.jobListingsContainer.append(companyCard);
         });
     }
 
+
+
     showModal(company) {
-        this.modalCompanyName.text(company.username);
+        this.currentCompany = company;
+        this.$modalCompanyName.text(company.username);
         this.$modalJobPosition.text(`Job Position: ${company.desired_job}`);
         this.$modalSalary.text(`Salary: ${company.expected_salary}`);
         this.$modalLocation.text(`Location: ${company.work_location}`);
@@ -83,6 +88,7 @@ class AcGamePlayground {
     }
 
     addModalEventListeners() {
+        let outer = this;
         this.closeButton.on('click', () => {
             this.modal.hide();
         });
@@ -90,6 +96,40 @@ class AcGamePlayground {
         $(window).on('click', event => {
             if (event.target === this.modal[0]) {
                 this.modal.hide();
+            }
+        });
+
+        this.$closePlaygroundButton.on('click', () => {
+            this.hide();
+            outer.root.menu.show();
+        });
+
+        this.$applyButton.on('click', () => {
+            this.applyForJob();
+        });
+    }
+
+    applyForJob() {
+        let jobseekerId = this.jobseekerId;
+        let company = this.currentCompany
+
+        $.ajax({
+            url: `http://124.220.162.220:8000/settings/applyforjob/`,
+            type: 'GET',
+            data: {
+                jobseeker_id:jobseekerId,
+                company_id: company.id,
+                job_position: company.desired_job,
+                salary: company.expected_salary,
+                location: company.work_location
+            },
+            dataType: 'json',
+            success: (response) => {
+                alert(response.message);
+            },
+            error: (error) => {
+                console.error('Error applying for job:', error);
+                alert('Error applying for job');
             }
         });
     }
@@ -149,6 +189,33 @@ class AcGamePlayground {
 
     hide() {
         this.$playground.hide();
+    }
+
+    fetchCompanyDetails(companyId) {
+        let outer = this;
+        $.ajax({
+            url: `http://124.220.162.220:8000/settings/getcompanydetails/${companyId}/`,
+            method: 'GET',
+            dataType: 'json',
+            success: (company) => {
+                this.showModal(company);
+            },
+            error: (error) => {
+                console.error('Error fetching company details:', error);
+            }
+        });
+        $.ajax({
+            url: `http://124.220.162.220:8000/settings/getinfo/`,
+            method: 'GET',
+            dataType: 'json',
+            success: (data) => {
+                outer.jobseekerId = data.id;
+            },
+            error: (error) => {
+                console.error('Error fetching company details:', error);
+            }
+        });
+
     }
 }
 
