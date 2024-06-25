@@ -5,8 +5,8 @@ from jobseeker.models.jobseekers.jobseekers import Jobseeker
 from jobseeker.models.companys.company import Company
 from jobseeker.models.forms.form import Form
 
-def get_form(request, jobseeker_id):
-    forms = Form.objects.filter(jobseeker_id=jobseeker_id)
+def hr_get_form(request, company_id):
+    forms = Form.objects.filter(company_id=company_id)
     form_list = []
 
     for form in forms:

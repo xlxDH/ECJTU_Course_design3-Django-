@@ -451,15 +451,15 @@ class hr_AcGameMenu {
 <div class="ac-game-menu">
     <div class="ac-game-menu-field">
         <div class="ac-game-menu-field-item ac-game-menu-field-item-single-mode">
-            单人模式
+            全部公司
         </div>
         <br>
         <div class="ac-game-menu-field-item ac-game-menu-field-item-multi-mode">
-            多人模式
+            申请情况
         </div>
         <br>
         <div class="ac-game-menu-field-item ac-game-menu-field-item-profile">
-            个人信息
+            公司信息
         </div>
         <br>
         <div class="ac-game-menu-field-item ac-game-menu-field-item-settings">
@@ -492,7 +492,7 @@ class hr_AcGameMenu {
         });
         this.$multi_mode.click(function(){
             outer.hide();
-            outer.root.playground.show();
+            outer.root.form.show();
         });
         this.$settings.click(function(){
             outer.root.settings.logout_on_remote();
@@ -616,7 +616,7 @@ class AcForm {
         applications.forEach(application => {
             const row = $(`
                 <tr data-id="${application.id}">
-                    <td>${application.company_id}</td>
+                    <td>${application.company_name}</td>
                     <td>${application.job_position}</td>
                     <td>${application.salary}</td>
                     <td>${application.location}</td>
@@ -677,6 +677,194 @@ class AcForm {
                 id: applicationId,
                 is_jobseeker_approved: isApproved,
                 jobseeker_id: this.jobseekerId
+            },
+            success: (response) => {
+                alert(response.message);
+                this.modal.hide();
+                this.fetchApplications(); // 重新获取申请数据
+            },
+            error: (error) => {
+                console.error('Error updating application:', error);
+                alert('Error updating application');
+            }
+        });
+    }
+
+    show() {
+        this.$formContainer.show();
+        this.root.$ac_game.append(this.$formContainer);
+    }
+
+    hide() {
+        this.$formContainer.hide();
+    }
+}
+
+class hr_AcForm {
+    constructor(root) {
+        this.root = root;
+        this.companyId = null;
+        this.$formContainer = $(`
+            <div class="ac-game-playground">
+                <div class="job-applications-container">
+                    <h2 text-align:center>Job Applications</h2>
+                    <table class="table table-bordered" id="applicationsTable">
+                        <thead>
+                            <tr>
+                                <th>求职者</th>
+                                <th>就任职业</th>
+                                <th>薪资</th>
+                                <th>工作地点</th>
+                                <th>求职者是否同意</th>
+                                <th>是否同意</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be dynamically inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="approvalModal" class="modal">
+                    <div class="modal-content">
+                        <h5>Update Approval Status</h5>
+                        <form id="approvalForm">
+                            <div class="form-group">
+                                <label for="isCompanyApproved">Approved</label>
+                                <select class="form-control" id="isCompanyApproved">
+                                    <option value="true">Yes</option>
+                                    <option value="false">No</option>
+                                </select>
+                            </div>
+                            <input type="hidden" id="applicationId">
+                        </form>
+                        <button type="button" class="btn btn-secondary close-button">Close</button>
+                        <button type="button" class="btn btn-primary" id="saveApprovalButton">Save changes</button>
+                    </div>
+                </div>
+                <button class="close-form-button">返回菜单</button>
+            </div>
+        `);
+
+        this.$closeFormButton = this.$formContainer.find('.close-form-button');
+        this.applicationsTable = this.$formContainer.find('#applicationsTable tbody');
+        this.modal = this.$formContainer.find('#approvalModal');
+        this.applicationIdInput = this.$formContainer.find('#applicationId');
+        this.isCompanyApprovedSelect = this.$formContainer.find('#isCompanyApproved');
+        this.closeButtons = this.$formContainer.find('.close-button');
+        this.saveApprovalButton = this.$formContainer.find('#saveApprovalButton');
+
+        this.hide();
+
+        this.start();
+    }
+
+    start() {
+        this.fetchJobseekerId();
+        this.fetchApplications(); // 获取申请数据
+        this.addModalEventListeners(); // 添加模态框事件监听器
+    }
+
+    fetchJobseekerId() {
+        let outer = this;
+
+        $.ajax({
+            url: 'http://124.220.162.220:8000/settings/hrgetinfo/',
+            method: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                outer.companyId = data.id;
+                outer.fetchApplications(); // 在获取到求职者ID后再获取申请数据
+            },
+            error: function(error) {
+                console.error('Error fetching jobseeker info:', error);
+            }
+        });
+    }
+
+    fetchApplications() {
+        if(this.companyId===null){
+            return;
+        }
+
+        $.ajax({
+            url: `http://124.220.162.220:8000/settings/hrgetapplications/${this.companyId}/`,
+            method: 'GET',
+            dataType: 'json',
+            success: (data) => {
+                this.renderApplications(data); // 渲染申请数据
+            },
+            error: (error) => {
+                console.error('Error fetching applications:', error);
+            }
+        });
+    }
+
+    renderApplications(applications) {
+        this.applicationsTable.empty();
+        applications.forEach(application => {
+            const row = $(`
+                <tr data-id="${application.id}">
+                    <td>${application.jobseeker_name}</td>
+                    <td>${application.job_position}</td>
+                    <td>${application.salary}</td>
+                    <td>${application.location}</td>
+                    <td>${application.is_jobseeker_approved ? 'Yes':'No'}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-primary edit-approval-button" data-id="${application.id}" data-approved="${application.is_company_approved}">
+                            ${application.is_company_approved ? 'Yes' : 'No'}
+                        </button>
+                    </td>
+                </tr>
+            `);
+
+            row.find('.edit-approval-button').on('click', () => {
+                this.showModal(application.id, application.is_company_approved);
+            });
+
+            this.applicationsTable.append(row);
+        });
+    }
+
+    showModal(applicationId, isApproved) {
+        this.applicationIdInput.val(applicationId);
+        this.isCompanyApprovedSelect.val(isApproved.toString());
+        this.modal.show();
+    }
+
+    addModalEventListeners() {
+        let outer = this;
+        this.closeButtons.on('click', () => {
+            this.modal.hide();
+        });
+
+        $(window).on('click', (event) => {
+            if (event.target === this.modal[0]) {
+                this.modal.hide();
+            }
+        });
+
+        this.saveApprovalButton.on('click', () => {
+            this.updateApplication();
+        });
+
+        this.$closeFormButton.on('click', () => {
+            this.hide();
+            outer.root.menu.show();
+        });
+
+    }
+
+    updateApplication() {
+        let applicationId = this.applicationIdInput.val();
+        let isApproved = this.isCompanyApprovedSelect.val();
+
+        $.ajax({
+            url: 'http://124.220.162.220:8000/settings/hrupdateapplication/',
+            method: 'GET',
+            data: {
+                id: applicationId,
+                is_company_approved: isApproved,
+                company_id: this.companyId
             },
             success: (response) => {
                 alert(response.message);
@@ -898,6 +1086,198 @@ class AcGamePlayground {
                 alert('Error applying for job');
             }
         });
+    }
+
+    show() {
+        // 设置 $playground 的样式
+        this.$playground.css({
+            width: '80%', // 页面宽度的80%
+            height: '80%', // 页面高度的80%
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: '#fefefe',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+            borderRadius: '8px',
+            padding: '20px',
+            overflow: 'auto'
+        });
+
+        // 设置 #jobListings 的样式
+        this.jobListingsContainer.css({
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            gap: '20px'
+        });
+
+        // 设置 modal 的样式
+        this.modal.css({
+            display: 'none', // 初始隐藏模态框
+            position: 'fixed',
+            zIndex: '1',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '80%',
+            maxWidth: '500px',
+            backgroundColor: '#fefefe',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+            borderRadius: '8px',
+            padding: '20px'
+        });
+
+        // 设置 modal 关闭按钮的样式
+        this.closeButton.css({
+            position: 'absolute',
+            top: '10px',
+            right: '10px',
+            fontSize: '24px',
+            cursor: 'pointer'
+        });
+
+        this.$playground.show();
+        this.root.$ac_game.append(this.$playground);
+    }
+
+    hide() {
+        this.$playground.hide();
+    }
+
+    fetchCompanyDetails(companyId) {
+        let outer = this;
+        $.ajax({
+            url: `http://124.220.162.220:8000/settings/getcompanydetails/${companyId}/`,
+            method: 'GET',
+            dataType: 'json',
+            success: (company) => {
+                this.showModal(company);
+            },
+            error: (error) => {
+                console.error('Error fetching company details:', error);
+            }
+        });
+        $.ajax({
+            url: `http://124.220.162.220:8000/settings/getinfo/`,
+            method: 'GET',
+            dataType: 'json',
+            success: (data) => {
+                outer.jobseekerId = data.id;
+            },
+            error: (error) => {
+                console.error('Error fetching company details:', error);
+            }
+        });
+
+    }
+}
+
+class hr_AcGamePlayground {
+    constructor(root) {
+        this.root = root;
+        this.$playground = $(`
+            <div class="ac-game-playground">
+                <div class="job-listings" id="jobListings"></div>
+                <div id="companyModal" class="modal">
+                    <div class="modal-content">
+                        <span class="modal-close-button">&times;</span>
+                        <h2 id="modalCompanyName"></h2>
+                        <p id="modalCompanyDescription"></p>
+                        <br>
+                        <p id="modalJobPosition"></p>
+                        <p id="modalSalary"></p>
+                        <p id="modalLocation"></p>
+                        <p id="modalPhone"></p>
+                    </div>
+                </div>
+                <button class="close-playground-button">返回菜单</button>
+            </div>
+        `);
+
+        this.jobListingsContainer = this.$playground.find('#jobListings');
+        this.modal = this.$playground.find('#companyModal');
+        this.modalCompanyDescription = this.$playground.find('#modalCompanyDescription');
+        this.$modalCompanyName = this.$playground.find('#modalCompanyName');
+        this.$modalJobPosition = this.$playground.find('#modalJobPosition');
+        this.$modalSalary = this.$playground.find('#modalSalary');
+        this.$modalLocation = this.$playground.find('#modalLocation');
+        this.$modalPhone = this.$playground.find('#modalPhone');
+        this.closeButton = this.$playground.find('.modal-close-button');
+        this.$closePlaygroundButton = this.$playground.find('.close-playground-button');
+        this.hide();
+
+        this.start();
+    }
+
+    start() {
+        this.fetchCompanies(); // 获取公司数据
+    }
+
+    fetchCompanies() {
+        $.ajax({
+            url: 'http://124.220.162.220:8000/settings/getcompanys/',
+            method: 'GET',
+            dataType: 'json',
+            success: (data) => {
+                this.companies = data; // 将获取到的公司列表保存到类的属性中
+                this.renderJobListings(); // 渲染公司列表
+                this.addModalEventListeners(); // 添加模态框事件监听器
+            },
+            error: (error) => {
+                console.error('Error fetching companies:', error);
+            }
+        });
+    }
+
+    renderJobListings() {
+        this.companies.forEach(company => {
+            const companyCard = $(`
+                <div class="company-card">
+                    <div class="img-box">
+                        <img src="${company.photo}" alt="Company Photo">
+                    </div>
+                    <div class="company-name">${company.username}</div>
+                </div>
+            `);
+            companyCard.addClass('offset-right');
+            companyCard.on('click', () => {
+                this.fetchCompanyDetails(company.id);
+            });
+            this.jobListingsContainer.append(companyCard);
+        });
+    }
+
+
+
+    showModal(company) {
+        this.currentCompany = company;
+        this.$modalCompanyName.text(company.username);
+        this.$modalJobPosition.text(`招聘职位: ${company.desired_job}`);
+        this.$modalSalary.text(`薪资: ${company.expected_salary}`);
+        this.$modalLocation.text(`工作地点: ${company.work_location}`);
+        this.$modalPhone.text(`公司电话: ${company.phone}`);
+        this.modalCompanyDescription.text(company.bio);
+        this.modal.show();
+    }
+
+    addModalEventListeners() {
+        let outer = this;
+        this.closeButton.on('click', () => {
+            this.modal.hide();
+        });
+
+        $(window).on('click', event => {
+            if (event.target === this.modal[0]) {
+                this.modal.hide();
+            }
+        });
+
+        this.$closePlaygroundButton.on('click', () => {
+            this.hide();
+            outer.root.menu.show();
+        });
+
     }
 
     show() {
@@ -1528,8 +1908,8 @@ export class hr_AcGame {
 
         this.settings = new hr_Settings(this);
         this.menu = new hr_AcGameMenu(this);
-        //this.playground = new hr_AcGamePlayground(this);
-
+        this.playground = new hr_AcGamePlayground(this);
+        this.form = new hr_AcForm(this);
         this.start();
     }
 

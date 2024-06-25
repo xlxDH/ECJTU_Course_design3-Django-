@@ -114,7 +114,7 @@ class hr_AcGameMenu {
         });
         this.$multi_mode.click(function(){
             outer.hide();
-            outer.root.playground.show();
+            outer.root.form.show();
         });
         this.$settings.click(function(){
             outer.root.settings.logout_on_remote();

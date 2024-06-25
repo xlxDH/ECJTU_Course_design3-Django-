@@ -20,6 +20,7 @@ def getinfo_web(request):
         company = Company.objects.get(user=user)
         return JsonResponse({
             'result' : "success",
+            'id': company.id,
             'username' : company.user.username,
             'photo' : company.photo,
             'phone': company.phone,

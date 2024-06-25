@@ -102,7 +102,7 @@ class AcForm {
         applications.forEach(application => {
             const row = $(`
                 <tr data-id="${application.id}">
-                    <td>${application.company_id}</td>
+                    <td>${application.company_name}</td>
                     <td>${application.job_position}</td>
                     <td>${application.salary}</td>
                     <td>${application.location}</td>
@@ -163,6 +163,194 @@ class AcForm {
                 id: applicationId,
                 is_jobseeker_approved: isApproved,
                 jobseeker_id: this.jobseekerId
+            },
+            success: (response) => {
+                alert(response.message);
+                this.modal.hide();
+                this.fetchApplications(); // 重新获取申请数据
+            },
+            error: (error) => {
+                console.error('Error updating application:', error);
+                alert('Error updating application');
+            }
+        });
+    }
+
+    show() {
+        this.$formContainer.show();
+        this.root.$ac_game.append(this.$formContainer);
+    }
+
+    hide() {
+        this.$formContainer.hide();
+    }
+}
+
+class hr_AcForm {
+    constructor(root) {
+        this.root = root;
+        this.companyId = null;
+        this.$formContainer = $(`
+            <div class="ac-game-playground">
+                <div class="job-applications-container">
+                    <h2 text-align:center>Job Applications</h2>
+                    <table class="table table-bordered" id="applicationsTable">
+                        <thead>
+                            <tr>
+                                <th>求职者</th>
+                                <th>就任职业</th>
+                                <th>薪资</th>
+                                <th>工作地点</th>
+                                <th>求职者是否同意</th>
+                                <th>是否同意</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be dynamically inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="approvalModal" class="modal">
+                    <div class="modal-content">
+                        <h5>Update Approval Status</h5>
+                        <form id="approvalForm">
+                            <div class="form-group">
+                                <label for="isCompanyApproved">Approved</label>
+                                <select class="form-control" id="isCompanyApproved">
+                                    <option value="true">Yes</option>
+                                    <option value="false">No</option>
+                                </select>
+                            </div>
+                            <input type="hidden" id="applicationId">
+                        </form>
+                        <button type="button" class="btn btn-secondary close-button">Close</button>
+                        <button type="button" class="btn btn-primary" id="saveApprovalButton">Save changes</button>
+                    </div>
+                </div>
+                <button class="close-form-button">返回菜单</button>
+            </div>
+        `);
+
+        this.$closeFormButton = this.$formContainer.find('.close-form-button');
+        this.applicationsTable = this.$formContainer.find('#applicationsTable tbody');
+        this.modal = this.$formContainer.find('#approvalModal');
+        this.applicationIdInput = this.$formContainer.find('#applicationId');
+        this.isCompanyApprovedSelect = this.$formContainer.find('#isCompanyApproved');
+        this.closeButtons = this.$formContainer.find('.close-button');
+        this.saveApprovalButton = this.$formContainer.find('#saveApprovalButton');
+
+        this.hide();
+
+        this.start();
+    }
+
+    start() {
+        this.fetchJobseekerId();
+        this.fetchApplications(); // 获取申请数据
+        this.addModalEventListeners(); // 添加模态框事件监听器
+    }
+
+    fetchJobseekerId() {
+        let outer = this;
+
+        $.ajax({
+            url: 'http://124.220.162.220:8000/settings/hrgetinfo/',
+            method: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                outer.companyId = data.id;
+                outer.fetchApplications(); // 在获取到求职者ID后再获取申请数据
+            },
+            error: function(error) {
+                console.error('Error fetching jobseeker info:', error);
+            }
+        });
+    }
+
+    fetchApplications() {
+        if(this.companyId===null){
+            return;
+        }
+
+        $.ajax({
+            url: `http://124.220.162.220:8000/settings/hrgetapplications/${this.companyId}/`,
+            method: 'GET',
+            dataType: 'json',
+            success: (data) => {
+                this.renderApplications(data); // 渲染申请数据
+            },
+            error: (error) => {
+                console.error('Error fetching applications:', error);
+            }
+        });
+    }
+
+    renderApplications(applications) {
+        this.applicationsTable.empty();
+        applications.forEach(application => {
+            const row = $(`
+                <tr data-id="${application.id}">
+                    <td>${application.jobseeker_name}</td>
+                    <td>${application.job_position}</td>
+                    <td>${application.salary}</td>
+                    <td>${application.location}</td>
+                    <td>${application.is_jobseeker_approved ? 'Yes':'No'}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-primary edit-approval-button" data-id="${application.id}" data-approved="${application.is_company_approved}">
+                            ${application.is_company_approved ? 'Yes' : 'No'}
+                        </button>
+                    </td>
+                </tr>
+            `);
+
+            row.find('.edit-approval-button').on('click', () => {
+                this.showModal(application.id, application.is_company_approved);
+            });
+
+            this.applicationsTable.append(row);
+        });
+    }
+
+    showModal(applicationId, isApproved) {
+        this.applicationIdInput.val(applicationId);
+        this.isCompanyApprovedSelect.val(isApproved.toString());
+        this.modal.show();
+    }
+
+    addModalEventListeners() {
+        let outer = this;
+        this.closeButtons.on('click', () => {
+            this.modal.hide();
+        });
+
+        $(window).on('click', (event) => {
+            if (event.target === this.modal[0]) {
+                this.modal.hide();
+            }
+        });
+
+        this.saveApprovalButton.on('click', () => {
+            this.updateApplication();
+        });
+
+        this.$closeFormButton.on('click', () => {
+            this.hide();
+            outer.root.menu.show();
+        });
+
+    }
+
+    updateApplication() {
+        let applicationId = this.applicationIdInput.val();
+        let isApproved = this.isCompanyApprovedSelect.val();
+
+        $.ajax({
+            url: 'http://124.220.162.220:8000/settings/hrupdateapplication/',
+            method: 'GET',
+            data: {
+                id: applicationId,
+                is_company_approved: isApproved,
+                company_id: this.companyId
             },
             success: (response) => {
                 alert(response.message);
