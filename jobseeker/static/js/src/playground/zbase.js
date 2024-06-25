@@ -9,11 +9,12 @@ class AcGamePlayground {
                         <span class="modal-close-button">&times;</span>
                         <h2 id="modalCompanyName"></h2>
                         <p id="modalCompanyDescription"></p>
+                        <br>
                         <p id="modalJobPosition"></p>
                         <p id="modalSalary"></p>
                         <p id="modalLocation"></p>
                         <p id="modalPhone"></p>
-                        <button id="applyButton">Apply for job</button>
+                        <button id="applyButton">申请求职</button>
                     </div>
                 </div>
                 <button class="close-playground-button">返回菜单</button>
@@ -79,10 +80,10 @@ class AcGamePlayground {
     showModal(company) {
         this.currentCompany = company;
         this.$modalCompanyName.text(company.username);
-        this.$modalJobPosition.text(`Job Position: ${company.desired_job}`);
-        this.$modalSalary.text(`Salary: ${company.expected_salary}`);
-        this.$modalLocation.text(`Location: ${company.work_location}`);
-        this.$modalPhone.text(`Phone: ${company.phone}`);
+        this.$modalJobPosition.text(`招聘职位: ${company.desired_job}`);
+        this.$modalSalary.text(`薪资: ${company.expected_salary}`);
+        this.$modalLocation.text(`工作地点: ${company.work_location}`);
+        this.$modalPhone.text(`公司电话: ${company.phone}`);
         this.modalCompanyDescription.text(company.bio);
         this.modal.show();
     }

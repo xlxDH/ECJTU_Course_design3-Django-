@@ -42,10 +42,12 @@ class Settings {
                         <button>登录</button>
                         <p>没有账号?去注册</p>
                     </div>
+                    <button class= "close-form-button" id="hr">公司登录</button>
                 </div>
             </div>
         `);
         this.setupEventListeners();
+
         this.$login = this.$settings.find(".login-form");
         this.$login_username = this.$login.find(".input-box #login_id");
         this.$login_password = this.$login.find(".input-box #login_password");
@@ -57,7 +59,7 @@ class Settings {
 
         this.$register_submit = this.$register.find(".btn-box button");
         this.$login_submit = this.$login.find(".btn-box button");
-
+        this.$hr = this.$login.find("#hr");
         this.root.$ac_game.append(this.$settings);
 
         this.start();
@@ -76,7 +78,6 @@ class Settings {
         let outer = this;
         this.add_listening_events_login();
         this.add_listening_events_register();
-
     }
 
     add_listening_events_login() {
@@ -84,6 +85,10 @@ class Settings {
 
         this.$login_submit.click(function() {
             outer.login_on_remote();
+        });
+
+        this.$hr.click(function() {
+             window.location.href = "http://124.220.162.220:8000/hr/";
         });
     }
 
@@ -296,6 +301,7 @@ class hr_Settings {
                         <button>登录</button>
                         <p>没有账号?去注册</p>
                     </div>
+                    <button class= "close-form-button" id="jobseeker">求职者登录</button>
                 </div>
             </div>
         `);
@@ -311,7 +317,7 @@ class hr_Settings {
 
         this.$register_submit = this.$register.find(".btn-box button");
         this.$login_submit = this.$login.find(".btn-box button");
-
+        this.$jobseeker = this.$login.find("#jobseeker");
         this.root.$ac_game.append(this.$settings);
 
         this.start();
@@ -338,6 +344,9 @@ class hr_Settings {
 
         this.$login_submit.click(function() {
             outer.login_on_remote();
+        });
+        this.$jobseeker.click(function() {
+             window.location.href = "http://124.220.162.220:8000/";
         });
     }
 

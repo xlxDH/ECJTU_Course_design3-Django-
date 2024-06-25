@@ -10,6 +10,8 @@ from jobseeker.views.settings.hr_register import hr_register
 from jobseeker.views.settings.get_companys import get_companys
 from jobseeker.views.settings.get_company_details import get_company_details
 from jobseeker.views.settings.apply_for_job import apply_for_job
+from jobseeker.views.settings.get_applications import get_form
+from jobseeker.views.settings.update_application import update_form
 
 
 urlpatterns = [
@@ -24,5 +26,7 @@ urlpatterns = [
     path("getcompanys/",get_companys,name="settings_getcompanys"),
     path("getcompanydetails/<int:company_id>/",get_company_details,name="settings_getcompanydetails"),
     path("applyforjob/",apply_for_job,name="settings_applyforjob"),
+    path("getapplications/<int:jobseeker_id>/",get_form,name="settings_getapplications"),
+    path("updateapplication/",update_form,name="settings_updateapplication"),
 ]
 

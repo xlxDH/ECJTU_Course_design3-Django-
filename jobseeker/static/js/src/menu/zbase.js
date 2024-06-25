@@ -5,11 +5,11 @@ class AcGameMenu {
 <div class="ac-game-menu">
     <div class="ac-game-menu-field">
         <div class="ac-game-menu-field-item ac-game-menu-field-item-single-mode">
-            单人模式
+            全部公司
         </div>
         <br>
         <div class="ac-game-menu-field-item ac-game-menu-field-item-multi-mode">
-            多人模式
+            申请情况
         </div>
         <br>
         <div class="ac-game-menu-field-item ac-game-menu-field-item-profile">
@@ -46,7 +46,7 @@ class AcGameMenu {
         });
         this.$multi_mode.click(function(){
             outer.hide();
-            outer.root.playground.show();
+            outer.root.form.show();
         });
         this.$settings.click(function(){
             outer.root.settings.logout_on_remote();
@@ -73,15 +73,15 @@ class hr_AcGameMenu {
 <div class="ac-game-menu">
     <div class="ac-game-menu-field">
         <div class="ac-game-menu-field-item ac-game-menu-field-item-single-mode">
-            单人模式
+            全部公司
         </div>
         <br>
         <div class="ac-game-menu-field-item ac-game-menu-field-item-multi-mode">
-            多人模式
+            申请情况
         </div>
         <br>
         <div class="ac-game-menu-field-item ac-game-menu-field-item-profile">
-            个人信息
+            公司信息
         </div>
         <br>
         <div class="ac-game-menu-field-item ac-game-menu-field-item-settings">
